@@ -6,9 +6,10 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Tuple
 
 import pandas as pd
+from Selector import BaseSelector
 
 # ---------- 日志 ----------
 logging.basicConfig(
@@ -59,7 +60,7 @@ def load_config(cfg_path: Path) -> List[Dict[str, Any]]:
     return cfgs
 
 
-def instantiate_selector(cfg: Dict[str, Any]):
+def instantiate_selector(cfg: Dict[str, Any]) -> Tuple[str, BaseSelector]:
     """动态加载 Selector 类并实例化"""
     cls_name: str = cfg.get("class")
     if not cls_name:

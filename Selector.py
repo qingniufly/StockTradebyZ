@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional, Any
+from abc import ABC, abstractmethod
 
 from scipy.signal import find_peaks
 import numpy as np
@@ -144,7 +145,29 @@ def _find_peaks(
 
 
 # --------------------------- Selector 类 --------------------------- #
-class BBIKDJSelector:
+class BaseSelector(ABC):
+    """
+    选股器的抽象基类，定义通用的接口和方法。
+    """
+
+    @abstractmethod
+    def _passes_filters(self, hist: pd.DataFrame) -> bool:
+        """
+        检查单支股票是否符合筛选条件。
+        """
+        pass
+
+    @abstractmethod
+    def select(
+        self, date: pd.Timestamp, data: Dict[str, pd.DataFrame]
+    ) -> List[str]:
+        """
+        批量筛选符合条件的股票代码。
+        """
+        pass
+
+
+class BBIKDJSelector(BaseSelector):
     """
     自适应 *BBI(导数)* + *KDJ* 选股器
         • BBI: 允许 bbi_q_threshold 比例的回撤
@@ -222,7 +245,7 @@ class BBIKDJSelector:
         return picks
 
 
-class PeakKDJSelector:
+class PeakKDJSelector(BaseSelector):
     """
     Peaks + KDJ 选股器    
     """
@@ -334,7 +357,7 @@ class PeakKDJSelector:
         return picks
     
 
-class BBIShortLongSelector:
+class BBIShortLongSelector(BaseSelector):
     """
     BBI 上升 + 短/长期 RSV 条件 + DIF > 0 选股器
     """
